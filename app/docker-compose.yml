@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - node_app_1
+      - node_app_2
+      - node_app_3
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8000/hostname"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  node_app_1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      AUTHOR: "FedorBakunin"
+      UUID: "replica-1-uuid-1234567890abcdef"
+    volumes:
+      - /etc/hostname:/etc/hostname:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8000/hostname"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  node_app_2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      AUTHOR: "FedorBakunin"
+      UUID: "replica-2-uuid-abcdef1234567890"
+    volumes:
+      - /etc/hostname:/etc/hostname:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8000/hostname"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  node_app_3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      AUTHOR: "FedorBakunin"
+      UUID: "replica-3-uuid-fedcba0987654321"
+    volumes:
+      - /etc/hostname:/etc/hostname:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8000/hostname"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
